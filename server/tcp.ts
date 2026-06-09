@@ -7,20 +7,42 @@ Bun.listen({
   socket: {
     data(socket, data) {
       try {
-        const message = JSON.parse(data.toString());
+        const payload = data.toString();
+        const message = JSON.parse(payload);
 
-        devices.set(message.hostname, {
-          ...message,
+        const existing = devices.get(message.hostname);
+
+        const logs = existing?.logs ? [...existing.logs] : [];
+
+        logs.push({
           timestamp: Date.now(),
+          direction: "RX",
+          payload,
         });
 
-        console.log("Update:", message.hostname);
-        console.log("Received:", data.toString());
+        while (logs.length > 10) {
+          logs.shift();
+        }
+
+        devices.set(message.hostname, {
+          hostname: message.hostname,
+          cpu: message.cpu,
+          ram: message.ram,
+          uptime: message.uptime,
+
+          timestamp: Date.now(),
+
+          logs,
+        });
+
+        console.log(`Update: ${message.hostname}`);
       } catch (err) {
         console.error(err);
       }
     },
   },
 });
+
+console.log("TCP Server running on :9000");
 
 console.log("TCP Server running on :9000");
