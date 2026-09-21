@@ -169,6 +169,3 @@ from any device on the same network.
 * Network Traffic Analysis
 * File Transfer Support
 * Multi-Network Monitoring
-
-```
-```
